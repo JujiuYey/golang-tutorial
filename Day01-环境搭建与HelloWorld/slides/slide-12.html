@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>开发工具对比</title>
+<style>
+html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; display: flex; justify-content: center; align-items: center; background: #000; }
+.slide-content { width: 960px; height: 540px; position: relative; transform-origin: center center; background: #03045e; }
+</style>
+<script>
+function scaleSlide() {
+  const slide = document.querySelector('.slide-content');
+  if (!slide) return;
+  const slideWidth = 960;
+  const slideHeight = 540;
+  const scaleX = window.innerWidth / slideWidth;
+  const scaleY = window.innerHeight / slideHeight;
+  const scale = Math.min(scaleX, scaleY);
+  slide.style.width = slideWidth + 'px';
+  slide.style.height = slideHeight + 'px';
+  slide.style.transform = `scale(${scale})`;
+  slide.style.transformOrigin = 'center center';
+}
+window.addEventListener('load', scaleSlide);
+window.addEventListener('resize', scaleSlide);
+</script>
+</head>
+<body>
+<div class="slide-content">
+  <p style="position:absolute; left:60px; top:30px; font-size:36px; font-weight:700; color:#ffffff; margin:0; font-family:'Times New Roman', serif;">推荐开发工具</p>
+  <svg width="120" height="4" style="position:absolute; left:60px; top:80px;">
+    <rect width="120" height="4" fill="#00b4d8"/>
+  </svg>
+  <div style="position:absolute; left:60px; top:110px; width:380px; height:200px; background:#0077b6; border-radius:12px;">
+    <p style="font-size:24px; color:#ffffff; margin:20px 0 0 20px; font-weight:700; font-family:'Times New Roman', serif;">VS Code (推荐)</p>
+    <p style="font-size:14px; color:#caf0f8; margin:15px 20px 0 20px; font-family:'Times New Roman', serif;">免费、轻量、可扩展性强</p>
+    <p style="font-size:14px; color:#caf0f8; margin:10px 20px 0 20px; font-family:'Times New Roman', serif;">插件: Go, Go Nightly</p>
+    <p style="font-size:14px; color:#caf0f8; margin:10px 20px 0 20px; font-family:'Times New Roman', serif;">适合: 初学者、学习阶段</p>
+  </div>
+  <div style="position:absolute; left:480px; top:110px; width:380px; height:200px; background:#00b4d8; border-radius:12px;">
+    <p style="font-size:24px; color:#ffffff; margin:20px 0 0 20px; font-weight:700; font-family:'Times New Roman', serif;">GoLand (JetBrains)</p>
+    <p style="font-size:14px; color:#03045e; margin:15px 20px 0 20px; font-family:'Times New Roman', serif;">专业、功能全面、收费</p>
+    <p style="font-size:14px; color:#03045e; margin:10px 20px 0 20px; font-family:'Times New Roman', serif;">重构、调试、代码导航</p>
+    <p style="font-size:14px; color:#03045e; margin:10px 20px 0 20px; font-family:'Times New Roman', serif;">适合: 专业开发、项目实战</p>
+  </div>
+  <div style="position:absolute; left:60px; top:340px; width:800px;">
+    <p style="font-size:18px; color:#00b4d8; margin:0 0 15px 0; font-weight:700; font-family:'Times New Roman', serif;">VS Code Go 插件配置</p>
+    <div style="background:#001d3d; padding:15px 20px; border-radius:8px;">
+      <p style="font-size:13px; color:#90e0ef; margin:0; font-family:'Courier New', monospace;">1. 安装扩展: "Go" (by Go Team at Google)</p>
+      <p style="font-size:13px; color:#90e0ef; margin:8px 0 0 0; font-family:'Courier New', monospace;">2. Cmd/Ctrl + Shift + P → "Go: Install/Update Tools"</p>
+      <p style="font-size:13px; color:#90e0ef; margin:8px 0 0 0; font-family:'Courier New', monospace;">3. 全选所有工具，点击确定安装</p>
+    </div>
+  </div>
+  <svg style="position:absolute; right:32px; bottom:24px;" width="36" height="36" viewBox="0 0 36 36">
+    <circle cx="18" cy="18" r="18" fill="#00b4d8"/>
+    <text x="18" y="18" text-anchor="middle" dominant-baseline="central" font-size="14" font-weight="600" fill="#ffffff">12</text>
+  </svg>
+</div>
+</body>
+</html>

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>变量与常量</title>
+<style>
+html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; display: flex; justify-content: center; align-items: center; background: #000; }
+.slide-content { width: 960px; height: 540px; position: relative; transform-origin: center center; background: #03045e; }
+</style>
+<script>
+function scaleSlide() {
+  const slide = document.querySelector('.slide-content');
+  if (!slide) return;
+  slide.style.width = '960px';
+  slide.style.height = '540px';
+  slide.style.transform = `scale(${Math.min(window.innerWidth/960, window.innerHeight/540)})`;
+  slide.style.transformOrigin = 'center center';
+}
+window.addEventListener('load', scaleSlide);
+window.addEventListener('resize', scaleSlide);
+</script>
+</head>
+<body>
+<div class="slide-content">
+  <p style="position:absolute; left:60px; top:30px; font-size:32px; font-weight:700; color:#ffffff; margin:0; font-family:'Times New Roman', serif;">变量与常量</p>
+  <svg width="100" height="4" style="position:absolute; left:60px; top:75px;"><rect width="100" height="4" fill="#00b4d8"/></svg>
+  <div style="position:absolute; left:60px; top:100px; width:400px;">
+    <p style="font-size:18px; color:#00b4d8; margin:0 0 10px 0; font-weight:700;">变量声明</p>
+    <div style="background:#001d3d; padding:12px; border-radius:8px;">
+      <p style="font-size:12px; color:#90e0ef; margin:0; font-family:'Courier New', monospace;">var name string = "Go"</p>
+      <p style="font-size:12px; color:#90e0ef; margin:8px 0 0 0; font-family:'Courier New', monospace;">age := 18  <span style="color:#2a9d8f;">// 简短声明</span></p>
+      <p style="font-size:12px; color:#90e0ef; margin:8px 0 0 0; font-family:'Courier New', monospace;">var a, b int  <span style="color:#2a9d8f;">// 多变量</span></p>
+    </div>
+  </div>
+  <div style="position:absolute; left:500px; top:100px; width:400px;">
+    <p style="font-size:18px; color:#00b4d8; margin:0 0 10px 0; font-weight:700;">常量声明</p>
+    <div style="background:#001d3d; padding:12px; border-radius:8px;">
+      <p style="font-size:12px; color:#90e0ef; margin:0; font-family:'Courier New', monospace;">const PI = 3.14159</p>
+      <p style="font-size:12px; color:#90e0ef; margin:8px 0 0 0; font-family:'Courier New', monospace;">const (</p>
+      <p style="font-size:12px; color:#90e0ef; margin:0 0 0 20px; font-family:'Courier New', monospace;">A = 1</p>
+      <p style="font-size:12px; color:#90e0ef; margin:0 0 0 20px; font-family:'Courier New', monospace;">B = 2</p>
+      <p style="font-size:12px; color:#90e0ef; margin:0; font-family:'Courier New', monospace;">)</p>
+    </div>
+  </div>
+  <div style="position:absolute; left:60px; top:280px; width:840px;">
+    <p style="font-size:18px; color:#00b4d8; margin:0 0 10px 0; font-weight:700;">iota枚举</p>
+    <div style="background:#0077b6; padding:12px; border-radius:8px;">
+      <p style="font-size:12px; color:#ffffff; margin:0; font-family:'Courier New', monospace;">const (</p>
+      <p style="font-size:12px; color:#ffffff; margin:0 0 0 20px; font-family:'Courier New', monospace;">A = iota  <span style="color:#90e0ef;">// 0</span></p>
+      <p style="font-size:12px; color:#ffffff; margin:0 0 0 20px; font-family:'Courier New', monospace;">B       <span style="color:#90e0ef;">// 1</span></p>
+      <p style="font-size:12px; color:#ffffff; margin:0 0 0 20px; font-family:'Courier New', monospace;">C       <span style="color:#90e0ef;">// 2</span></p>
+      <p style="font-size:12px; color:#ffffff; margin:0; font-family:'Courier New', monospace;">)</p>
+    </div>
+  </div>
+  <div style="position:absolute; left:60px; top:420px; width:840px;">
+    <p style="font-size:14px; color:#caf0f8; margin:0;">注意: := 只能用于函数内部，var可以用于全局</p>
+  </div>
+  <svg style="position:absolute; right:32px; bottom:24px;" width="36" height="36" viewBox="0 0 36 36">
+    <circle cx="18" cy="18" r="18" fill="#00b4d8"/>
+    <text x="18" y="18" text-anchor="middle" dominant-baseline="central" font-size="14" font-weight="600" fill="#ffffff">3</text>
+  </svg>
+</div>
+</body>
+</html>

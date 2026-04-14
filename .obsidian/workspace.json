@@ -1,0 +1,200 @@
+{
+  "main": {
+    "id": "3e2d7de7cef33fa0",
+    "type": "split",
+    "children": [
+      {
+        "id": "8699ae7048e0819c",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "e752057f85095b14",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "Day01-环境搭建与HelloWorld/Day01-环境搭建与HelloWorld.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "Day01-环境搭建与HelloWorld"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "1f74f78aeb5d5659",
+    "type": "split",
+    "children": [
+      {
+        "id": "aecfd0fee2e6b0e8",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "da39954699a82f11",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical",
+                "autoReveal": false
+              },
+              "icon": "lucide-folder-closed",
+              "title": "文件列表"
+            }
+          },
+          {
+            "id": "c7ec52e3106419df",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-search",
+              "title": "搜索"
+            }
+          },
+          {
+            "id": "5791eb2de78c125a",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {},
+              "icon": "lucide-bookmark",
+              "title": "书签"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "right": {
+    "id": "f93f0e97199298da",
+    "type": "split",
+    "children": [
+      {
+        "id": "c1334f589aa55069",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "d1e0a541f87b58b5",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "Day20-21-工程化/Day20-21-工程化.md",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-coming-in",
+              "title": "Day20-21-工程化 的反向链接列表"
+            }
+          },
+          {
+            "id": "c4653c4e5d373800",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "file": "Day20-21-工程化/Day20-21-工程化.md",
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-going-out",
+              "title": "Day20-21-工程化 的出链列表"
+            }
+          },
+          {
+            "id": "ddfd0ae561c90a50",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-tags",
+              "title": "标签"
+            }
+          },
+          {
+            "id": "b66c4a3adc9843c6",
+            "type": "leaf",
+            "state": {
+              "type": "all-properties",
+              "state": {
+                "sortOrder": "frequency",
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-archive",
+              "title": "添加笔记属性"
+            }
+          },
+          {
+            "id": "92ae1321ab82dedd",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "Day20-21-工程化/Day20-21-工程化.md",
+                "followCursor": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-list",
+              "title": "Day20-21-工程化 的大纲"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:打开快速切换": false,
+      "graph:查看关系图谱": false,
+      "canvas:新建白板": false,
+      "daily-notes:打开/创建今天的日记": false,
+      "templates:插入模板": false,
+      "command-palette:打开命令面板": false,
+      "bases:新建数据库": false
+    }
+  },
+  "active": "e752057f85095b14",
+  "lastOpenFiles": [
+    "Day01-环境搭建与HelloWorld/slides/imgs/cover.png",
+    "Day01-环境搭建与HelloWorld/Day01-环境搭建与HelloWorld.md",
+    "Day20-21-工程化/Day20-21-工程化.md",
+    "Day18-19-Fiber框架/Day18-19-Fiber框架.md",
+    "Day16-17-BunORM/Day16-17-BunORM.md",
+    "Day12-13-核心标准库/Day12-13-核心标准库.md",
+    "Day10-11-并发编程/Day10-11-并发编程.md",
+    "Day08-09-面向对象/Day08-09-面向对象.md",
+    "Day06-07-复合数据类型/Day06-07-复合数据类型.md",
+    "Day04-05-函数与错误处理/Day04-05-函数与错误处理.md",
+    "Day02-03-基础语法/Day02-03-基础语法.md"
+  ]
+}

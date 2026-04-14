@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第一个Go程序</title>
+<style>
+html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; display: flex; justify-content: center; align-items: center; background: #000; }
+.slide-content { width: 960px; height: 540px; position: relative; transform-origin: center center; background: #03045e; }
+</style>
+<script>
+function scaleSlide() {
+  const slide = document.querySelector('.slide-content');
+  if (!slide) return;
+  const slideWidth = 960;
+  const slideHeight = 540;
+  const scaleX = window.innerWidth / slideWidth;
+  const scaleY = window.innerHeight / slideHeight;
+  const scale = Math.min(scaleX, scaleY);
+  slide.style.width = slideWidth + 'px';
+  slide.style.height = slideHeight + 'px';
+  slide.style.transform = `scale(${scale})`;
+  slide.style.transformOrigin = 'center center';
+}
+window.addEventListener('load', scaleSlide);
+window.addEventListener('resize', scaleSlide);
+</script>
+</head>
+<body>
+<div class="slide-content">
+  <p style="position:absolute; left:60px; top:30px; font-size:36px; font-weight:700; color:#ffffff; margin:0; font-family:'Times New Roman', serif;">第一个Go程序</p>
+  <svg width="120" height="4" style="position:absolute; left:60px; top:80px;">
+    <rect width="120" height="4" fill="#00b4d8"/>
+  </svg>
+  <div style="position:absolute; left:60px; top:110px; width:500px;">
+    <div style="background:#001d3d; padding:20px; border-radius:12px; border:2px solid #00b4d8;">
+      <p style="font-size:13px; color:#90e0ef; margin:0; font-family:'Courier New', monospace;"> 1  package main</p>
+      <p style="font-size:13px; color:#90e0ef; margin:0; font-family:'Courier New', monospace;"> 2</p>
+      <p style="font-size:13px; color:#90e0ef; margin:0; font-family:'Courier New', monospace;"> 3  <span style="color:#2a9d8f;">import</span> "fmt"</p>
+      <p style="font-size:13px; color:#90e0ef; margin:0; font-family:'Courier New', monospace;"> 4</p>
+      <p style="font-size:13px; color:#90e0ef; margin:0; font-family:'Courier New', monospace;"> 5  <span style="color:#2a9d8f;">func</span> main() {</p>
+      <p style="font-size:13px; color:#90e0ef; margin:0; font-family:'Courier New', monospace;"> 6      fmt.Println("Hello, World!")</p>
+      <p style="font-size:13px; color:#90e0ef; margin:0; font-family:'Courier New', monospace;"> 7  }</p>
+    </div>
+  </div>
+  <div style="position:absolute; left:580px; top:110px; width:320px;">
+    <p style="font-size:16px; color:#00b4d8; margin:0 0 15px 0; font-weight:700; font-family:'Times New Roman', serif;">代码说明</p>
+    <p style="font-size:14px; color:#caf0f8; margin:0 0 10px 0; font-family:'Times New Roman', serif;">• <strong>package main</strong>: 入口包名</p>
+    <p style="font-size:14px; color:#caf0f8; margin:0 0 10px 0; font-family:'Times New Roman', serif;">• <strong>import "fmt"</strong>: 导入格式化包</p>
+    <p style="font-size:14px; color:#caf0f8; margin:0 0 10px 0; font-family:'Times New Roman', serif;">• <strong>func main()</strong>: 主函数入口</p>
+    <p style="font-size:14px; color:#caf0f8; margin:0; font-family:'Times New Roman', serif;">• <strong>fmt.Println()</strong>: 打印输出</p>
+  </div>
+  <div style="position:absolute; left:60px; top:400px; width:840px;">
+    <p style="font-size:16px; color:#00b4d8; margin:0 0 15px 0; font-weight:700; font-family:'Times New Roman', serif;">运行程序</p>
+    <div style="background:#0077b6; padding:15px 20px; border-radius:8px;">
+      <p style="font-size:14px; color:#ffffff; margin:0; font-family:'Courier New', monospace;">go run main.go</p>
+      <p style="font-size:14px; color:#90e0ef; margin:10px 0 0 0; font-family:'Courier New', monospace;"># 输出: Hello, World!</p>
+    </div>
+  </div>
+  <svg style="position:absolute; right:32px; bottom:24px;" width="36" height="36" viewBox="0 0 36 36">
+    <circle cx="18" cy="18" r="18" fill="#00b4d8"/>
+    <text x="18" y="18" text-anchor="middle" dominant-baseline="central" font-size="14" font-weight="600" fill="#ffffff">8</text>
+  </svg>
+</div>
+</body>
+</html>

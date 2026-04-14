@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>练习作业</title>
+<style>
+html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; display: flex; justify-content: center; align-items: center; background: #000; }
+.slide-content { width: 960px; height: 540px; position: relative; transform-origin: center center; background: #0077b6; }
+</style>
+<script>
+function scaleSlide() {
+  const slide = document.querySelector('.slide-content');
+  if (!slide) return;
+  const slideWidth = 960;
+  const slideHeight = 540;
+  const scaleX = window.innerWidth / slideWidth;
+  const scaleY = window.innerHeight / slideHeight;
+  const scale = Math.min(scaleX, scaleY);
+  slide.style.width = slideWidth + 'px';
+  slide.style.height = slideHeight + 'px';
+  slide.style.transform = `scale(${scale})`;
+  slide.style.transformOrigin = 'center center';
+}
+window.addEventListener('load', scaleSlide);
+window.addEventListener('resize', scaleSlide);
+</script>
+</head>
+<body>
+<div class="slide-content">
+  <svg width="200" height="540" style="position:absolute; left:0; top:0;">
+    <rect width="200" height="540" fill="#03045e"/>
+  </svg>
+  <p style="position:absolute; left:60px; top:200px; font-size:120px; font-weight:700; color:#ffffff; margin:0; font-family:'Times New Roman', serif; opacity:0.3;">06</p>
+  <p style="position:absolute; left:260px; top:220px; font-size:48px; font-weight:700; color:#ffffff; margin:0; font-family:'Times New Roman', serif;">练习作业</p>
+  <p style="position:absolute; left:260px; top:290px; font-size:20px; color:#caf0f8; margin:0; font-family:'Times New Roman', serif;">动手实践，巩固所学</p>
+  <svg style="position:absolute; right:32px; bottom:24px;" width="36" height="36" viewBox="0 0 36 36">
+    <circle cx="18" cy="18" r="18" fill="#03045e"/>
+    <text x="18" y="18" text-anchor="middle" dominant-baseline="central" font-size="14" font-weight="600" fill="#ffffff">13</text>
+  </svg>
+</div>
+</body>
+</html>
