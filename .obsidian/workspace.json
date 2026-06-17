@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "项目二-FiberRESTAPI/项目二-FiberRESTAPI.md",
+                "file": "02-类型状态与控制流/02-变量声明赋值零值与作用域.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "项目二-FiberRESTAPI"
+              "title": "02-变量声明赋值零值与作用域"
             }
           }
         ]
@@ -40,7 +40,7 @@
             "state": {
               "type": "file-explorer",
               "state": {
-                "sortOrder": "alphabeticalReverse",
+                "sortOrder": "alphabetical",
                 "autoReveal": false
               },
               "icon": "lucide-folder-closed",
@@ -78,7 +78,7 @@
       }
     ],
     "direction": "horizontal",
-    "width": 300
+    "width": 300.5
   },
   "right": {
     "id": "f93f0e97199298da",
@@ -94,8 +94,8 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "Day20-21-工程化/Day20-21-工程化.md",
-                "collapseAll": false,
+                "file": "01-工具链与HelloWorld/01-工具链与HelloWorld.md",
+                "collapseAll": true,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
                 "showSearch": false,
@@ -104,7 +104,7 @@
                 "unlinkedCollapsed": true
               },
               "icon": "links-coming-in",
-              "title": "Day20-21-工程化 的反向链接列表"
+              "title": "01-工具链与HelloWorld 的反向链接列表"
             }
           },
           {
@@ -156,21 +156,21 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "Day20-21-工程化/Day20-21-工程化.md",
+                "file": "02-类型状态与控制流/02-变量声明赋值零值与作用域.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "Day20-21-工程化 的大纲"
+              "title": "02-变量声明赋值零值与作用域 的大纲"
             }
           }
-        ]
+        ],
+        "currentTab": 4
       }
     ],
     "direction": "horizontal",
-    "width": 300,
-    "collapsed": true
+    "width": 300
   },
   "left-ribbon": {
     "hiddenItems": {
@@ -185,17 +185,42 @@
   },
   "active": "e752057f85095b14",
   "lastOpenFiles": [
-    "项目一-CLI工具/项目一-CLI任务管理器.md",
-    "Day01-环境搭建与HelloWorld/Day01-环境搭建与HelloWorld.md",
-    "Day01-环境搭建与HelloWorld/slides/imgs/cover.png",
-    "Day20-21-工程化/Day20-21-工程化.md",
-    "Day18-19-Fiber框架/Day18-19-Fiber框架.md",
-    "Day16-17-BunORM/Day16-17-BunORM.md",
-    "Day12-13-核心标准库/Day12-13-核心标准库.md",
-    "Day10-11-并发编程/Day10-11-并发编程.md",
-    "Day08-09-面向对象/Day08-09-面向对象.md",
-    "Day06-07-复合数据类型/Day06-07-复合数据类型.md",
-    "Day04-05-函数与错误处理/Day04-05-函数与错误处理.md",
-    "Day02-03-基础语法/Day02-03-基础语法.md"
+    "docs/superpowers/specs/2026-06-17-teacher-led-go-learning-loop-design.md",
+    "docs/superpowers/specs",
+    "docs/superpowers",
+    "docs",
+    "02-类型状态与控制流/01-值类型与字面量.md",
+    "learning-log/daily/2026-06-17.md",
+    "02-类型状态与控制流/README.md",
+    "temp/temp.go",
+    "temp",
+    "01-工具链与HelloWorld/01-工具链与HelloWorld.md",
+    "AGENTS.md",
+    "opencode.json",
+    "README.md",
+    "11-工程化与验证/01-工程化与验证心智模型.md",
+    "11-工程化与验证/02-项目结构包边界与internal.md",
+    "11-工程化与验证/03-Go-Modules依赖版本与可复现构建.md",
+    "11-工程化与验证/04-格式化go-vet与静态检查.md",
+    "11-工程化与验证/05-单元测试表驱动测试与子测试.md",
+    "11-工程化与验证/06-测试替身临时资源与httptest.md",
+    "11-工程化与验证/07-覆盖率race-detector与并发验证.md",
+    "11-工程化与验证/08-基准测试pprof与性能分析.md",
+    "11-工程化与验证/09-Makefile与本地任务编排.md",
+    "11-工程化与验证/10-CI流水线与质量门禁.md",
+    "11-工程化与验证/11-构建版本信息与Docker镜像.md",
+    "10-Web服务/08-业务服务层与Repository协作.md",
+    "11-工程化与验证/11-工程化与验证.md",
+    "11-工程化与验证/12-最小复现日志与排障闭环.md",
+    "11-工程化与验证/README.md",
+    "10-Web服务/07-中间件链日志恢复认证.md",
+    "10-Web服务/06-统一错误处理与状态码.md",
+    "10-Web服务/05-请求DTO校验与响应DTO.md",
+    "10-Web服务/04-路由注册与Handler组织.md",
+    "project-02-FiberRESTAPI",
+    "project-01-CLI任务管理器",
+    "11-工程化与验证",
+    "10-Web服务",
+    "Day01-环境搭建与HelloWorld/slides/imgs/cover.png"
   ]
 }
