@@ -4,12 +4,12 @@
 
 - 学习目标：系统学习 Go，能讲清概念、写出最小代码、用命令验证结果。
 - 教学偏好：老师主导 25 分钟标准课；诊断只作为入口；需要短讲解、小练习、命令验证和日志闭环。
-- 当前水平：02 基础类型与控制流大部分核心点已覆盖；剩余 08 for、09 switch 待学。
-- 已完成主题：值类型和字面量；零值；var 声明与类型推断；`:=` 短声明；作用域与变量遮蔽；赋值；常量与 iota；数字类型与浮点不精确；字符串、byte 与 rune；显式类型转换与 `string(byte)` vs `strconv.Itoa`；布尔表达式与 if 必须是 bool；if 初始化语句（err-handling 惯用法）。
-- 当前薄弱点：容易把值类型/引用类型和栈/堆分配混在一起（保留到 04 章节）；range 索引的字节/字符混淆（今天已练过基本功）。
-- 当前模块：02 类型状态与控制流（已完成 01-07）
-- 下一节目标：02-08 for 循环与 range。
-- 验证习惯：已用 `go run` 验证 `len`、索引、`range`、`string(byte)` vs `strconv.Itoa`、类型不匹配修复、`if n{}` 编译错误、`canRegister` 函数、`strconv.Atoi` + if init；后续继续用 `go run` / `go test` 验证。
+- 当前水平：02 基础类型与控制流大部分核心点已覆盖；剩余 10 综合练习待学。
+- 已完成主题：值类型和字面量；零值；var 声明与类型推断；`:=` 短声明；作用域与变量遮蔽；赋值；常量与 iota；数字类型与浮点不精确；字符串、byte 与 rune；显式类型转换与 `string(byte)` vs `strconv.Itoa`；布尔表达式与 if 必须是 bool；if 初始化语句（err-handling 惯用法）；for 循环与 range（三种基本形式 + `_` 占位 + range 值是副本 + range string 字节索引跳号 + range map 顺序不保证 + 练习 `sum`/`multiply`）；switch 基础（默认不贯穿 + 多值 case + 无表达式 switch）+ grade 练习。
+- 当前薄弱点：容易把值类型/引用类型和栈/堆分配混在一起（保留到 04 章节）；range 索引字节/字符混淆（今天再次练习，预测基本正确但描述绕，再观察）；`v *= 10` 容易跟指针混淆（今天讲过复合赋值是 `v = v * 10`，与指针无关，下次再观察）。
+- 当前模块：02 类型状态与控制流（已完成 01-09）
+- 下一节目标：02-10 基础语法综合练习（用户决定延后，让知识"发酵"再回来做）。
+- 验证习惯：已用 `go run` 验证 `len`、索引、`range`、`string(byte)` vs `strconv.Itoa`、类型不匹配修复、`if n{}` 编译错误、`canRegister` 函数、`strconv.Atoi` + if init、range 三种形式、`v *= 10` 改副本不改原 slice、range string 字节跳号 `0 1 2 5`、练习 `sum: 6` + `after multiply: [10 20 30]`、switch 多值 case 输出 `weekend`、grade 函数 7 个分数全对；后续继续用 `go run` / `go test` 验证。
 
 ## Agent 约定
 
