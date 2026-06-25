@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "02-类型状态与控制流/07-布尔表达式与条件判断.md",
+                "file": "02-类型状态与控制流/10-基础语法综合练习.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "07-布尔表达式与条件判断"
+              "title": "10-基础语法综合练习"
             }
           }
         ]
@@ -156,13 +156,13 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "02-类型状态与控制流/07-布尔表达式与条件判断.md",
+                "file": "02-类型状态与控制流/10-基础语法综合练习.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "07-布尔表达式与条件判断 的大纲"
+              "title": "10-基础语法综合练习 的大纲"
             }
           }
         ],
@@ -185,12 +185,18 @@
   },
   "active": "e752057f85095b14",
   "lastOpenFiles": [
+    "02-类型状态与控制流/09-switch与跳转语句.md",
+    "temp/switch_basic.go",
+    "02-类型状态与控制流/08-for循环与range.md",
+    "learning-log/daily/2026-06-25.md",
+    "temp/range_string.go",
+    "temp/range_value_copy.go",
+    "04-数据结构与内存语义/08-指针地址解引用与可变状态.md",
+    "temp/range_slice_index.go",
+    "02-类型状态与控制流/07-布尔表达式与条件判断.md",
     "temp/test.py",
     "02-类型状态与控制流/06-显式类型转换.md",
-    "02-类型状态与控制流/09-switch与跳转语句.md",
-    "02-类型状态与控制流/08-for循环与range.md",
     "未命名.md",
-    "02-类型状态与控制流/07-布尔表达式与条件判断.md",
     "skills-lock.json",
     "temp/test.go",
     "02-类型状态与控制流/05-字符串byte与rune.md",
@@ -199,13 +205,8 @@
     "temp/string-demo",
     "02-类型状态与控制流/04-数字类型与运算.md",
     "temp/percent.go",
-    "temp/float_precision.go",
-    "temp/int_div.go",
     "02-类型状态与控制流/03-常量与iota.md",
-    "temp/typed_const_err.go",
-    "temp/untyped_const_ok.go",
     "AGENTS.md",
-    "temp/const_iota.go",
     "02-类型状态与控制流/02-变量声明赋值零值与作用域.md",
     "docs/superpowers/specs/2026-06-17-teacher-led-go-learning-loop-design.md",
     "02-类型状态与控制流/01-值类型与字面量.md",
@@ -219,8 +220,6 @@
     "11-工程化与验证/04-格式化go-vet与静态检查.md",
     "11-工程化与验证/05-单元测试表驱动测试与子测试.md",
     "11-工程化与验证/06-测试替身临时资源与httptest.md",
-    "11-工程化与验证/07-覆盖率race-detector与并发验证.md",
-    "11-工程化与验证/08-基准测试pprof与性能分析.md",
     "Day01-环境搭建与HelloWorld/slides/imgs/cover.png"
   ]
 }
