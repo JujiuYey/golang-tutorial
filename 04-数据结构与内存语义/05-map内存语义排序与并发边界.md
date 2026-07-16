@@ -1,6 +1,6 @@
 # 05: map 的内存语义、排序与并发边界
 
-map 变量本身可以被复制，但复制后仍然指向同一份底层哈希表。理解这一点，才能看懂 map 赋值、传参和修改的行为。
+这篇解决"map 传来传去之后，改动到底算谁的"——赋值、传参之后两个变量指向**同一份哈希表**（这回 Go 终于和你的 JS 对象直觉一致了），顺便处理两个工程必踩的点：怎么让 map 稳定输出、为什么并发读写会直接把程序打死。
 
 ---
 
@@ -12,11 +12,26 @@ b := a
 
 b["x"] = 100
 
-fmt.Println(a["x"]) // 100
-fmt.Println(b["x"]) // 100
+fmt.Println(a["x"])
+fmt.Println(b["x"])
 ```
 
-赋值复制的是 map 变量本身。两个变量都可以访问同一份底层数据。
+```text
+100
+100
+```
+
+改 `b`，`a` 跟着变——和 JS 的 `const b = a`（对象）行为一致。原理：map 变量本身是个很小的**句柄**（内部就是指向底层哈希表的指针），`b := a` 复制的是句柄，两个句柄指向同一张表：
+
+```text
+a ──┐
+    ├──▶ 同一份底层哈希表 {x: 1}
+b ──┘
+```
+
+对照前两篇排个座次：**数组赋值 = 复制全部元素；slice 赋值 = 复制窗口（共享底层数组）；map 赋值 = 复制句柄（共享整张表）。** 共享程度一个比一个彻底。
+
+顺带拆一个常见误会：有人管 map 叫"引用类型"并推出"所以它分配在堆上"。前半句凑合，后半句不成立——**值/引用说的是"复制时共享不共享"，栈/堆说的是"内存分配在哪"，是两个维度的问题**。第 08 篇会用编译器的逃逸分析输出正面拆这件事。
 
 ---
 
@@ -30,32 +45,40 @@ func addScore(scores map[string]int, name string, score int) {
 func main() {
     scores := map[string]int{}
     addScore(scores, "alice", 100)
-    fmt.Println(scores["alice"]) // 100
+    fmt.Println(scores["alice"])
 }
 ```
 
-函数参数仍然是值传递。这里复制的是 map 变量，复制后的变量仍然指向同一份底层数据，所以函数里写入键值会影响调用方看到的 map 内容。
+```text
+100
+```
+
+注意措辞：Go 的传参**永远是值传递**，这里复制的是 map 句柄这个"值"。副本句柄仍指向同一张表，所以函数里写 key，调用方看得见。和 JS 函数收到对象参数的感觉完全一样。
 
 ---
 
 ## 3. 重新赋值不会改掉调用方的 map 变量
 
+共享的边界在哪？让参数**指向别处**时：
+
 ```go
 func reset(scores map[string]int) {
-    scores = make(map[string]int)
+    scores = make(map[string]int)   // 只是让"参数这个句柄"指向新表
     scores["alice"] = 100
 }
 
 func main() {
     scores := map[string]int{"bob": 90}
     reset(scores)
-    fmt.Println(scores) // map[bob:90]
+    fmt.Println(scores)
 }
 ```
 
-`reset` 里只是让参数变量指向新的 map，没有改变调用方变量 `scores` 本身。
+```text
+map[bob:90]
+```
 
-如果确实要让调用方拿到新 map，更清晰的方式是返回新值：
+调用方毫发无损。JS 里同样如此（函数里 `obj = {}` 改不了外面的变量）——这个直觉可以放心迁移。**改表里的内容，外面看得见；给句柄换一张表，外面看不见。** 真要给调用方一张新表，返回它：
 
 ```go
 func reset() map[string]int {
@@ -67,32 +90,53 @@ func reset() map[string]int {
 
 ## 4. map 元素不可取地址
 
-不能直接修改 map 中 struct 值的字段。
+### 🕳️ 坑：不能直接改 map 里 struct 值的字段
+
+以为会怎样：`users["alice"].Age++`，和 JS 改嵌套对象一样顺手。
+实际怎样：编译错误。
+为什么：map 扩容搬迁时元素会挪窝，Go 拒绝给你一个"可能随时失效的地址"，干脆禁止对 map 元素做原地修改。
 
 ```go
+package main
+
+import "fmt"
+
 type User struct {
-    Name string
-    Age  int
+	Name string
+	Age  int
 }
 
-users := map[string]User{
-    "alice": {Name: "alice", Age: 18},
-}
+func main() {
+	users := map[string]User{
+		"alice": {Name: "alice", Age: 18},
+	}
 
-// users["alice"].Age++ // 编译错误
+	users["alice"].Age++
+
+	fmt.Println(users)
+}
 ```
 
-原因是 map 扩容和搬迁时，元素位置可能变化。Go 不允许拿到 map 元素的稳定地址。
+```text
+# command-line-arguments
+./main.go:15:2: cannot assign to struct field users["alice"].Age in map
+```
 
-正确写法是取出、修改、放回：
+正确姿势是**取出、修改、放回**三步：
 
 ```go
 u := users["alice"]
 u.Age++
 users["alice"] = u
+
+fmt.Println(users["alice"])
 ```
 
-也可以让 map 保存指针：
+```text
+{alice 19}
+```
+
+或者让 map 存**指针**，指针指向的对象不归 map 管、地址稳定，就能直接改：
 
 ```go
 users := map[string]*User{
@@ -100,41 +144,56 @@ users := map[string]*User{
 }
 
 users["alice"].Age++
+fmt.Println(users["alice"].Age)
 ```
 
-保存指针后要额外注意 nil 指针和共享可变状态。
+```text
+19
+```
+
+代价是要开始操心 nil 指针和"多处共享同一个可变对象"（第 08 篇的主题）。
+
+| 写法 | 修改字段 | 风险 |
+|------|------|------|
+| `map[string]User` | 取出、改、放回 | 啰嗦但数据独立 |
+| `map[string]*User` | 直接 `.Age++` | nil 指针、共享可变状态 |
 
 ---
 
 ## 5. map 不能直接比较
 
-map 只能和 `nil` 比较。
+和 slice 一样，map 只能和 `nil` 比：
 
 ```go
-var m map[string]int
-fmt.Println(m == nil)
+package main
+
+import "fmt"
+
+func main() {
+	a := map[string]int{"x": 1}
+	b := map[string]int{"x": 1}
+	fmt.Println(a == b)
+}
 ```
 
-不能比较两个 map 内容是否相等：
-
-```go
-// a := map[string]int{"x": 1}
-// b := map[string]int{"x": 1}
-// fmt.Println(a == b) // 编译错误
+```text
+# command-line-arguments
+./main.go:8:14: invalid operation: a == b (map can only be compared to nil)
 ```
 
-如果要比较内容，需要遍历键值，或在合适章节学习标准库里的 `maps.Equal`。
+要比内容，自己遍历，或用标准库的 `maps.Equal`（标准库模块再展开）。
 
 ---
 
 ## 6. 稳定输出需要排序
 
-map 遍历顺序不稳定。如果要稳定打印、测试或生成输出，先取出 key 并排序。
+上一篇看过 map 遍历顺序故意随机。要稳定打印（写测试、生成文档、CLI 输出都需要），套路是**取出 key → 排序 → 按序访问**：
 
 ```go
 scores := map[string]int{
     "bob":   90,
     "alice": 100,
+    "carol": 95,
 }
 
 names := make([]string, 0, len(scores))
@@ -149,23 +208,35 @@ for _, name := range names {
 }
 ```
 
-稳定输出是写测试、生成文档、输出 CLI 结果时非常重要的习惯。
+```text
+alice 100
+bob 90
+carol 95
+```
+
+三步各自都是学过的东西：range 收集 key（预分配容量，第 03 篇）、`sort.Strings` 排序、按序取值。这个组合值得肌肉记忆。
 
 ---
 
 ## 7. 遍历时修改 map
 
-遍历 map 时删除当前或尚未遍历的 key 是允许的，但不要依赖复杂行为。
+遍历中**删除** key 是明确允许的：
 
 ```go
-for key := range scores {
-    if scores[key] == 0 {
-        delete(scores, key)
+m := map[string]int{"a": 0, "b": 2, "c": 0, "d": 4}
+for key := range m {
+    if m[key] == 0 {
+        delete(m, key)
     }
 }
+fmt.Println(m)
 ```
 
-遍历过程中新增 key，新增项是否会在本轮遍历中出现是不确定的。清晰的做法是先收集，再统一修改：
+```text
+map[b:2 d:4]
+```
+
+但遍历中**新增** key 就进灰色地带了——新项本轮遍历可能出现也可能不出现，规范就是这么写的。别赌。复杂改动用"先收集，再统一动手"：
 
 ```go
 var toDelete []string
@@ -184,27 +255,48 @@ for _, key := range toDelete {
 
 ## 8. 并发边界
 
-普通 map 不支持并发读写。
+普通 map **不允许并发读写**。这不是"结果可能不对"级别的问题——运行时检测到就直接把整个进程打死，连 03 模块的 recover 都救不回来：
 
 ```go
-// 一个 goroutine 写 map，另一个 goroutine 同时读或写 map，可能触发运行时错误或数据竞争。
+m := make(map[int]int)
+
+go func() {                 // 一个 goroutine 在写（go 关键字并发模块细讲）
+    for i := 0; ; i++ {
+        m[i] = i
+    }
+}()
+
+for i := 0; ; i++ {         // main 也在写同一个 map
+    m[i] = i
+}
 ```
 
-并发场景常见选择：
+```text
+fatal error: concurrent map writes
 
-- 用 `sync.Mutex` 保护 map。
-- 用 channel 把 map 操作集中到一个 goroutine。
-- 特定读多写少场景考虑 `sync.Map`。
+goroutine 6 [running]:
+internal/runtime/maps.fatal({0x1047c02da?, 0x0?})
+	runtime/panic.go:1046 +0x20
+main.main.func1()
+	./main.go:8 +0x38
+created by main.main in goroutine 1
+	./main.go:6 +0x60
+（后面还有各 goroutine 的堆栈，此处截断）
+```
 
-并发会在后续章节详细展开。现在先记住：普通 map 不是并发安全容器。
+注意开头是 `fatal error` 不是 `panic:`——**fatal error 无法 recover**。并发场景的常见选择（并发模块细讲，先记名字）：
+
+- 用 `sync.Mutex` 给 map 加锁。
+- 用 channel 把所有 map 操作集中到一个 goroutine。
+- 读多写少的特定场景用 `sync.Map`。
+
+**现阶段记住一句：普通 map 不是并发安全容器，多 goroutine 碰同一个 map = 进程暴毙。**
 
 ---
 
 ## 9. 删除不一定立刻释放所有内存
 
-`delete` 会删除键值关系，但 map 的底层空间是否马上归还给系统，不应该作为业务假设。
-
-如果一个 map 曾经非常大，之后要长期保留但只剩少量数据，可以考虑创建新 map，把需要的数据复制过去。
+`delete` 删的是键值关系，底层哈希表占的空间未必马上归还系统——别把"删完内存就降"当成业务假设。如果一个 map 曾经巨大、之后长期只剩少量数据，可以新建小表搬家：
 
 ```go
 small := make(map[string]int, len(old))
@@ -213,8 +305,20 @@ for k, v := range old {
         small[k] = v
     }
 }
-old = small
+old = small   // 旧的大表没人引用了，交给 GC
 ```
+
+和第 03 篇"切小片拽住大数组"是同一类问题：**持有大结构的一小部分，可能让整个大结构无法回收。**
+
+---
+
+## 本篇重点
+
+- [ ] map 赋值/传参复制的是句柄，指向同一张哈希表——改内容外面可见，换表（重新赋值）外面不可见，和 JS 对象直觉一致。
+- [ ] "引用语义"≠"分配在堆上"：共享与否和栈/堆是两个维度，第 08 篇用逃逸分析实证。
+- [ ] map 元素不可取地址：改 struct 值字段要"取出、改、放回"，或改存指针（接受 nil 与共享的风险）。
+- [ ] 稳定输出三步走：收集 key → `sort.Strings` → 按序访问；map 之间不能 `==`。
+- [ ] 并发读写普通 map 是 `fatal error`，recover 都救不了；边遍历边新增 key 行为不确定，先收集再修改。
 
 ---
 
@@ -224,3 +328,5 @@ old = small
 2. 写函数 `SortedKeys(m map[string]int) []string`，返回排序后的 key。
 3. 创建 `map[string]User`，尝试直接修改字段，观察编译错误，再改成取出、修改、放回。
 4. 创建 `map[string]*User`，修改字段，解释为什么这次可以生效。
+
+提示：第 1 题想想为什么不能 `b := a` 完事（第 1 节刚做过实验）；第 4 题的答案就藏在第 4 节的表格里，重点是"map 管的是指针这个值，不管指针指向的东西"。

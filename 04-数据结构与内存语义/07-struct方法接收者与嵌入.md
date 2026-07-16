@@ -1,10 +1,12 @@
 # 07: struct 方法、接收者与嵌入
 
-方法让类型拥有行为。struct 配合方法，可以把数据和操作数据的逻辑组织在一起。
+这篇给 struct 装上行为（方法），核心是一个 JS 里不存在的选择题：**接收者用值还是用指针**——选错了，方法改半天字段，调用方那边纹丝不动。顺便学嵌入：Go 没有 class 继承，代码复用靠"组合 + 提升"。
 
 ---
 
 ## 1. 定义方法
+
+方法就是"绑定了类型的函数"——在 `func` 和函数名之间多写一对括号：
 
 ```go
 type User struct {
@@ -17,133 +19,186 @@ func (u User) Greet() string {
 }
 ```
 
-`(u User)` 是接收者。它表示 `Greet` 是 `User` 类型的方法。
+拆开这个新语法：
 
-调用：
+```text
+func (u User) Greet() string
+//   ───┬────
+//   接收者：u 相当于 JS 方法里的 this，
+//   只不过要显式命名、显式写类型
+```
+
+调用和 JS 一样用点号：
 
 ```go
 u := User{Name: "alice"}
 fmt.Println(u.Greet())
 ```
 
+```text
+hello, alice
+```
+
+对比 JS：class 方法里 `this` 是隐式的、行为还随调用方式漂移；Go 把它拍在明面上——接收者就是方法的第一个参数，规规矩矩走传参那套规则。这句话是下一节的伏笔。
+
 ---
 
 ## 2. 值接收者
 
-值接收者会复制接收者。
+**接收者遵守传参规则**意味着：值接收者 = 复制一份 struct 进方法。
 
 ```go
 func (u User) Rename(name string) {
-    u.Name = name
+    u.Name = name    // 改的是复制进来的那一份
 }
 
 func main() {
     u := User{Name: "alice"}
     u.Rename("bob")
-    fmt.Println(u.Name) // alice
+    fmt.Println(u.Name)
 }
 ```
 
-`Rename` 修改的是副本，所以调用方的 `u` 没变。
+```text
+alice
+```
 
-值接收者适合：
+改名失败——`Rename` 拿到的 `u` 是副本，方法结束副本就丢了。这在 JS 里根本不可能发生（`this` 永远指向对象本身），所以值得专门记：**值接收者的方法，改字段改了个寂寞。**
 
-- 方法不需要修改接收者。
-- 类型较小，复制成本低。
-- 你希望这个类型表现得像普通值。
+值接收者适合：方法只读不写、类型小复制便宜、希望类型表现得像普通值（比如 `Point`、`time.Time` 这类）。
 
 ---
 
 ## 3. 指针接收者
 
-指针接收者可以修改原值。
+想让方法真的改到调用方的数据，接收者写成指针：
 
 ```go
 func (u *User) Rename(name string) {
-    u.Name = name
+    u.Name = name    // 通过地址找到原 struct 去改
 }
 
 func main() {
     u := User{Name: "alice"}
     u.Rename("bob")
-    fmt.Println(u.Name) // bob
+    fmt.Println(u.Name)
 }
 ```
 
-指针接收者适合：
+```text
+bob
+```
 
-- 方法需要修改接收者。
-- 类型较大，复制成本不值得。
-- 类型中包含锁、缓冲区、连接等不应该被复制的字段。
-- 你希望所有方法都使用一致的接收者风格。
+生效了。指针接收者适合：
+
+- 方法需要修改接收者（最常见的理由）。
+- struct 较大，不想每次调用都复制。
+- 类型里有锁、连接、缓冲区这类**不该被复制**的字段。
+- 同一类型的方法风格要统一——只要有一个方法用指针接收者，其余的通常跟着用。
+
+| 接收者 | 方法里拿到的 | 能改到原值吗 | JS 对应 |
+|------|------|------|------|
+| `(u User)` | 副本 | 不能 | 无对应，JS 做不到 |
+| `(u *User)` | 地址 | 能 | 就是 `this` 的日常行为 |
 
 ---
 
 ## 4. Go 会自动取地址和解引用
 
+按上一节的逻辑，`u` 是值、`Rename` 要指针，似乎得写 `(&u).Rename("bob")`？不用——编译器帮你：
+
 ```go
 u := User{Name: "alice"}
-u.Rename("bob")
+u.Rename("bob")        // 编译器自动处理成 (&u).Rename("bob")
 ```
 
-如果 `Rename` 是 `*User` 方法，`u.Rename("bob")` 会被编译器处理成类似 `(&u).Rename("bob")`。
-
-指针变量调用值接收者方法也可以：
+反过来也一样，指针调用值接收者方法会自动解引用：
 
 ```go
 p := &User{Name: "alice"}
-fmt.Println(p.Greet())
+fmt.Println(p.Greet()) // 自动处理成 (*p).Greet()
 ```
 
-编译器会自动解引用。
+```text
+hello, alice
+```
+
+所以日常调用时几乎感觉不到接收者类型的存在——**语法糖抹平了调用侧，但"改不改得到原值"的语义差异一点没变**，这正是它偶尔坑人的原因。
 
 ---
 
 ## 5. nil 指针接收者
 
-指针接收者方法有可能被 nil 指针调用。
+指针接收者方法可能被 nil 指针调上来。方法内部主动处理 nil，就是安全的：
 
 ```go
 func (u *User) IsZero() bool {
     return u == nil || (u.Name == "" && u.Age == 0)
 }
+
+var np *User
+fmt.Println(np.IsZero())
 ```
 
-只有在方法内部显式处理 nil 时，这种写法才安全。否则解引用 nil 指针会 panic。
+```text
+true
+```
+
+没处理 nil 就解引用，panic 伺候（03 模块见过的 nil pointer dereference）：
 
 ```go
+package main
+
+import "fmt"
+
+type User struct {
+	Name string
+	Age  int
+}
+
 func (u *User) NameLength() int {
-    return len(u.Name) // 如果 u 为 nil，会 panic
+	return len(u.Name)
+}
+
+func main() {
+	var u *User
+	fmt.Println(u.NameLength())
 }
 ```
+
+```text
+panic: runtime error: invalid memory address or nil pointer dereference
+[signal SIGSEGV: segmentation violation code=0x2 addr=0x8 pc=0x10228d46c]
+
+goroutine 1 [running]:
+main.(*User).NameLength(...)
+	./main.go:11
+main.main()
+	./main.go:16 +0x1c
+exit status 2
+```
+
+注意一个反 JS 直觉的细节：`np.NameLength()` 里**调用本身不炸**（不是 JS 的 "cannot read property of null"），炸的是方法体里第一次真正解引用 `u.Name` 的那行。方法调用只是把 nil 当接收者参数传了进去。
 
 ---
 
 ## 6. 接收者命名
 
-接收者名字通常短小，并和类型名有关：
+接收者名字惯例是类型名的首字母缩写，短小统一：
 
 ```go
-func (u User) Greet() string {
-    return "hello, " + u.Name
-}
-
-func (s Store) Save() error {
-    return nil
-}
-
-func (c Client) Get() error {
-    return nil
-}
+func (u User) Greet() string  { ... }
+func (s Store) Save() error   { ... }
+func (c Client) Get() error   { ... }
 ```
 
-不要把接收者都叫 `this` 或 `self`。Go 里没有固定的接收者关键字。
+不要写 `this` 或 `self`——不是语法禁止，是社区约定强烈反对。从 JS 迁移过来最容易手滑的就是这个。
 
 ---
 
 ## 7. struct 嵌入
 
-嵌入是一种组合方式。
+在 struct 里只写类型不写字段名，就是**嵌入**：
 
 ```go
 type Address struct {
@@ -152,9 +207,13 @@ type Address struct {
 
 type User struct {
     Name string
-    Address
+    Address        // ← 只有类型，没有字段名：嵌入
 }
+```
 
+嵌入后，内层字段被**提升**到外层，两条路径都能访问：
+
+```go
 u := User{
     Name: "alice",
     Address: Address{
@@ -162,15 +221,22 @@ u := User{
     },
 }
 
-fmt.Println(u.Address.City)
-fmt.Println(u.City)
+fmt.Println(u.Address.City)  // 完整路径
+fmt.Println(u.City)          // 提升后的短路径
 ```
 
-`u.City` 是提升字段访问。它让外层类型可以直接访问嵌入字段的字段。
+```text
+Shanghai
+Shanghai
+```
+
+注意初始化时字段名是类型名 `Address:`——嵌入字段其实有个隐式的名字，就是它的类型名。
 
 ---
 
 ## 8. 嵌入方法提升
+
+字段能提升，方法也能——这是 Go 复用行为的主要方式：
 
 ```go
 type Logger struct{}
@@ -180,7 +246,7 @@ func (Logger) Print(msg string) {
 }
 
 type Service struct {
-    Logger
+    Logger    // 嵌入之后，Service"自动获得"Print 方法
 }
 
 func main() {
@@ -189,15 +255,17 @@ func main() {
 }
 ```
 
-`Service` 嵌入了 `Logger`，因此可以直接调用提升后的 `Print` 方法。
+```text
+started
+```
 
-嵌入不是继承。它不会建立父子类体系，核心仍然是组合。
+看着像 JS 的 `class Service extends Logger`，但**嵌入不是继承**：没有父子类型关系（`Service` 不"是一个"`Logger`，不能当 `Logger` 用），没有方法重写多态，只是"把内层的东西摆到外层够得着的地方"。心智模型是**组合 + 转发的语法糖**。
 
 ---
 
 ## 9. 字段冲突
 
-如果外层和嵌入字段有同名字段，直接访问时优先外层字段。
+外层和嵌入层字段重名时，短路径优先**外层**：
 
 ```go
 type A struct {
@@ -214,36 +282,55 @@ b := B{
     A:    A{Name: "inner"},
 }
 
-fmt.Println(b.Name)   // outer
-fmt.Println(b.A.Name) // inner
+fmt.Println(b.Name)
+fmt.Println(b.A.Name)
 ```
 
-有冲突时，显式写完整路径更清晰。
+```text
+outer
+inner
+```
+
+规则：**路径越浅越优先**。有冲突时别依赖优先级，直接写完整路径，读代码的人少猜一步。
 
 ---
 
 ## 10. 方法值
 
-方法可以像函数一样保存到变量里。
+方法可以像函数一样存进变量（03 模块"函数是一等公民"的延伸），这叫方法值——**存的那一刻接收者就被绑定**：
 
 ```go
+func (u User) Greet() string  { return "hello, " + u.Name }
+func (u *User) GreetP() string { return "hello, " + u.Name }
+
 u := User{Name: "alice"}
-greet := u.Greet
-
-fmt.Println(greet())
-```
-
-方法值会绑定接收者。接收者是值还是指针，会影响后续是否看到修改。
-
-```go
-u := User{Name: "alice"}
-greet := u.Greet
+greet := u.Greet    // 值接收者：绑定时复制了一份 u
+greetP := u.GreetP  // 指针接收者：绑定的是 u 的地址
 
 u.Name = "bob"
-fmt.Println(greet()) // 取决于 Greet 的接收者和值绑定时的复制
+
+fmt.Println(greet())
+fmt.Println(greetP())
 ```
 
-这类细节不需要死记。遇到方法值和闭包结合的代码，要主动判断接收者是否被复制。
+```text
+hello, alice
+hello, bob
+```
+
+同一时刻绑定、同一时刻调用，结果却不同：值接收者在绑定瞬间**快照**了 `u`（改名与它无关），指针接收者拿的是地址（现场读到最新值）。是不是很眼熟？——**和 03 模块 defer 的"传参快照 vs 闭包现读"是同一个道理**，都是"复制发生在哪一刻"的问题。
+
+这类细节不用死记，遇到方法值 + 闭包的代码，主动问一句"接收者在绑定时被复制了吗"就够。
+
+---
+
+## 本篇重点
+
+- [ ] 方法 = 绑定接收者的函数；接收者是显式版的 `this`，走普通传参规则。
+- [ ] 值接收者拿副本，改字段无效；指针接收者拿地址，才能修改原值——JS 的 `this` 永远是后者，前者是 Go 特有的陷阱。
+- [ ] 调用侧 `&`/`*` 由编译器自动补全，语法无感但语义有别；有一个方法用指针接收者，整个类型统一用。
+- [ ] nil 指针能调方法，炸点在方法体内第一次解引用；防御式方法要先判 `u == nil`。
+- [ ] 嵌入是组合不是继承：字段、方法被"提升"到外层，重名时外层优先；方法值在绑定时按接收者类型决定快照还是引用。
 
 ---
 
@@ -254,3 +341,5 @@ fmt.Println(greet()) // 取决于 Greet 的接收者和值绑定时的复制
 3. 定义 `User` 嵌入 `Address`，访问提升字段。
 4. 定义 `Service` 嵌入 `Logger`，调用提升方法。
 5. 写一个 nil 指针接收者方法，并说明它为什么安全或不安全。
+
+提示：第 2 题是第 2、3 节实验的复刻，连续调三次 `Inc` 再打印，两个版本的差距会非常直观；第 5 题对照第 5 节，找出你方法里"第一次解引用"发生在哪一行。

@@ -1,28 +1,38 @@
 # 02: slice 基础：slice 头、len 与 cap
 
-slice 是 Go 中最常用的序列结构。它可以动态增长，但 slice 变量本身不是数组，它描述的是底层数组中的一段连续区域。
+这篇认识 Go 里最常用的序列结构 slice。你在 JS 里天天用的 `[1, 2, 3]`，在 Go 里对应的就是它——但 slice 不是"装元素的箱子"，而是**趴在一个底层数组上的窗口**。看懂"窗口"这个模型，下一篇那些"改一个 slice 另一个也变了"的灵异现象就全都能解释。
 
 ---
 
 ## 1. slice 的概念模型
 
-可以把 slice 理解成一个很小的描述符：
+一个 slice 变量本身非常小，就三个字段（slice 头，slice header）：
 
 ```go
 type sliceHeader struct {
-    data *T
-    len  int
-    cap  int
+    data *T  // 指向底层数组中的某个元素
+    len  int // 这扇窗口能看到几个元素
+    cap  int // 从窗口起点到底层数组末尾，总共有几个格子
 }
 ```
 
-这只是帮助理解的模型，不建议在业务代码里直接使用 `reflect.SliceHeader` 或 `unsafe` 操作 slice 内部结构。
+画出来是这样：
 
-三个关键点：
+```text
+slice 头            底层数组
+┌──────┐
+│ data ────────▶ ┌────┬────┬────┬────┬────┐
+│ len=3│         │ 10 │ 20 │ 30 │ ?? │ ?? │
+│ cap=5│         └────┴────┴────┴────┴────┘
+└──────┘         └── len 看得到 ──┘└─ 备用 ─┘
+```
 
-- `data`: 指向底层数组中的某个元素。
-- `len`: 当前 slice 能访问多少个元素。
-- `cap`: 从 `data` 开始到底层数组末尾最多还能容纳多少个元素。
+两个立刻有用的推论：
+
+- **slice 头本身是个普通的小值**。复制 slice 头很便宜（三个字段），但复制出来的两个头指向**同一个**底层数组——共享由此而来（下一篇的主题）。
+- 很多资料管 slice 叫"引用类型"，这个词凑合能用但容易带偏：slice 头就是个值，只是它内部**含一个指针**。至于底层数组住在栈还是堆，那是另一个维度的问题，第 08 篇会正面拆开。
+
+（这个 `sliceHeader` 只是帮助理解的模型，不要在业务代码里用 `unsafe` 去掏 slice 的内部结构。）
 
 ---
 
@@ -31,40 +41,71 @@ type sliceHeader struct {
 ```go
 var s []int
 
-fmt.Println(s == nil) // true
-fmt.Println(len(s))   // 0
-fmt.Println(cap(s))   // 0
+fmt.Println(s == nil)
+fmt.Println(len(s))
+fmt.Println(cap(s))
 ```
 
-未初始化的 slice 是 nil slice。nil slice 可以 `len`、`cap`、`range`、`append`。
+```text
+true
+0
+0
+```
+
+只声明不初始化，得到的是 **nil slice**——一个 `data` 指针为空的 slice 头。注意 `[]int` 方括号里是空的，这就是它和数组 `[3]int` 在写法上的唯一区别：**长度写在类型里的是数组，不写的是 slice。**
+
+nil slice 出乎意料地好用：`len`、`cap`、`range`、`append` 全都能直接上：
 
 ```go
 var s []int
 s = append(s, 1, 2, 3)
-fmt.Println(s) // [1 2 3]
+fmt.Println(s)
 ```
+
+```text
+[1 2 3]
+```
+
+对比 JS：`let s;` 之后 `s.push(1)` 会炸（`undefined` 没有方法）；Go 的 nil slice 被设计成"可以直接开始 append 的空列表"。所以 Go 代码里经常看到 `var result []int` 开头、循环里直接 append 的写法。
 
 ---
 
 ## 3. 空 slice 与 nil slice
 
 ```go
-var a []int
-b := []int{}
-c := make([]int, 0)
+var a []int          // nil slice
+b := []int{}         // 空 slice
+c := make([]int, 0)  // 空 slice
 
-fmt.Println(a == nil) // true
-fmt.Println(b == nil) // false
-fmt.Println(c == nil) // false
+fmt.Println(a == nil)
+fmt.Println(b == nil)
+fmt.Println(c == nil)
+fmt.Println(len(a), len(b), len(c))
 ```
 
-它们的长度都是 0：
+```text
+true
+false
+false
+0 0 0
+```
+
+三个的长度都是 0，日常逻辑里几乎可以混用。差别在对外输出的时候暴露——序列化成 JSON 时：
 
 ```go
-fmt.Println(len(a), len(b), len(c)) // 0 0 0
+ja, _ := json.Marshal(a)
+jb, _ := json.Marshal(b)
+
+fmt.Println(string(ja))
+fmt.Println(string(jb))
 ```
 
-多数业务逻辑里，nil slice 和空 slice 可以一样使用。需要序列化成 JSON、对外返回 API 数据时，二者可能表现不同：nil slice 通常编码为 `null`，空 slice 通常编码为 `[]`。
+```text
+null
+[]
+```
+
+**一句话总结：内部逻辑不区分 nil 和空 slice，写 API 返回值时要区分——前端拿到 `null` 还是 `[]` 可不是一回事。**
 
 ---
 
@@ -75,68 +116,116 @@ nums := []int{1, 2, 3}
 names := []string{"alice", "bob"}
 ```
 
-注意数组和 slice 字面量的区别：
+再对照一次数组和 slice 的字面量，差别只在方括号：
 
 ```go
-a := [3]int{1, 2, 3} // 数组
-s := []int{1, 2, 3}  // slice
+a := [3]int{1, 2, 3} // 数组：长度在类型里
+s := []int{1, 2, 3}  // slice：不写长度
 ```
 
-`[3]int` 的长度写在类型里；`[]int` 没有固定长度。
+背后的动作不一样：slice 字面量会先建一个底层数组，再造一个趴在上面的 slice 头给你。
 
 ---
 
 ## 5. 使用 make 创建 slice
 
+`make` 用来创建"指定长度/容量"的 slice：
+
 ```go
 s := make([]int, 3)
 
-fmt.Println(s)      // [0 0 0]
-fmt.Println(len(s)) // 3
-fmt.Println(cap(s)) // 3
+fmt.Println(s)
+fmt.Println(len(s), cap(s))
 ```
 
-指定长度和容量：
+```text
+[0 0 0]
+3 3
+```
+
+第三个参数单独指定容量：
 
 ```go
 s := make([]int, 3, 10)
-
-fmt.Println(len(s)) // 3
-fmt.Println(cap(s)) // 10
+fmt.Println(len(s), cap(s))
 ```
 
-这里 `len=3` 的位置已经存在，可以直接读写：
+```text
+3 10
+```
+
+拆开这行：
+
+```text
+make([]int, 3, 10)
+//    ─┬──  ┬  ─┬
+//   类型  len  cap：底层数组给10格，先亮出3格
+```
+
+### 🕳️ 坑：cap 里多出来的格子不能直接用下标访问
+
+以为会怎样：都分配了 10 格，`s[3]` 应该能写。
+实际怎样：panic。
+为什么：下标访问的合法范围由 `len` 决定，不是 `cap`。备用格子只能靠 `append` 把 `len` 推过去之后才可见。
 
 ```go
-s[0] = 100
+package main
+
+import "fmt"
+
+func main() {
+	s := make([]int, 3, 10)
+	s[3] = 1
+	fmt.Println(s)
+}
 ```
 
-`cap=10` 中多出来的容量不能直接用下标访问，只能通过 `append` 扩展长度后访问。
+```text
+panic: runtime error: index out of range [3] with length 3
+
+goroutine 1 [running]:
+main.main()
+	./main.go:7 +0x38
+exit status 2
+```
+
+注意 panic 消息说的是 `with length 3`——它只关心 len。
 
 ---
 
 ## 6. 切片表达式
 
+从现有 slice（或数组）上再开一扇窗口：
+
 ```go
 nums := []int{10, 20, 30, 40, 50}
 
 a := nums[1:4]
-fmt.Println(a) // [20 30 40]
+fmt.Println(a)
 ```
 
-语法是左闭右开：
-
-```go
-s[low:high]
+```text
+[20 30 40]
 ```
 
-常见写法：
+语法和 JS 的 `slice(1, 4)` 一样是**左闭右开**：
+
+```text
+nums[1:4]
+//   ┬ ┬
+//   │ └ 到下标4之前（不含4）
+//   └ 从下标1开始（含1）
+```
+
+省略写法也和 JS 类似：
 
 ```go
 nums[:3] // 从开头到下标 3 之前
 nums[2:] // 从下标 2 到末尾
 nums[:]  // 整个 slice
 ```
+
+但有个致命差异先剧透：JS 的 `arr.slice()` 返回**复制出来的新数组**；Go 的 `nums[1:4]` 只是**在同一个底层数组上开了扇新窗口**，不复制任何元素。证据在下一节和下一篇。
 
 ---
 
@@ -146,60 +235,92 @@ nums[:]  // 整个 slice
 nums := []int{10, 20, 30, 40, 50}
 a := nums[1:3]
 
-fmt.Println(a)      // [20 30]
-fmt.Println(len(a)) // 2
-fmt.Println(cap(a)) // 4
+fmt.Println(a)
+fmt.Println(len(a), cap(a))
 ```
 
-`a` 从 `nums[1]` 开始，长度到 `nums[3]` 之前，所以 `len=2`。容量从 `nums[1]` 一直算到底层数组末尾，所以 `cap=4`。
+```text
+[20 30]
+2 4
+```
+
+`len=2` 好理解（下标 1 到 3 之前，两个元素）。`cap` 为什么是 4？因为容量从窗口起点**一直数到底层数组末尾**：
+
+```text
+底层数组   10   20   30   40   50
+                └── a 的窗口 len=2
+                └────── a 的 cap=4 ──────┘
+```
+
+窗口右边那两格（40、50）虽然 `a` 现在看不到，但它们是 `a` 的"备用地盘"——`append` 时会先往那里写。这正是下一篇共享事故的案发现场，先把这张图记住。
 
 ---
 
 ## 8. 完整切片表达式
 
-完整切片表达式可以限制新 slice 的容量：
+多写一个数，可以把新窗口的**容量也掐断**：
 
 ```go
 nums := []int{10, 20, 30, 40, 50}
 a := nums[1:3:3]
 
-fmt.Println(a)      // [20 30]
-fmt.Println(len(a)) // 2
-fmt.Println(cap(a)) // 2
+fmt.Println(a)
+fmt.Println(len(a), cap(a))
+```
+
+```text
+[20 30]
+2 2
 ```
 
 语法：
 
-```go
-s[low:high:max]
+```text
+s[low : high : max]
+//  ┬     ┬     ┬
+//  起点  len终点  cap终点：容量 = max - low
 ```
 
-新 slice 的容量是 `max - low`。这个写法常用于限制后续 `append` 对原底层数组的影响。
+对比第 7 节：同样是 `[1:3]`，加上 `:3` 之后 cap 从 4 变成 2——备用地盘被没收了。这个写法专门用来**限制后续 append 波及原底层数组**，下一篇会用实验演示它怎么救命。
 
 ---
 
 ## 9. append 必须接收返回值
 
-`append` 返回新的 slice。
+`append` 返回追加后的新 slice 头，必须接住：
 
 ```go
 s := []int{1, 2}
 s = append(s, 3)
 ```
 
-不要这样写：
+不接不行——这在 Go 里直接是编译错误：
 
 ```go
-// append(s, 3) // 编译错误：append 的结果没有使用
+package main
+
+func main() {
+	s := []int{1, 2}
+	append(s, 3)
+}
 ```
 
-`append` 可能复用原底层数组，也可能分配新底层数组。调用后应该使用返回的 slice。
+```text
+# command-line-arguments
+./main.go:5:2: append(s, 3) (value of type []int) is not used
+```
+
+### 🕳️ 坑：append 不是 JS 的 push
+
+以为会怎样：像 `arr.push(3)` 一样原地改，不用管返回值。
+实际怎样：`append` 可能复用原底层数组，也可能**搬去一个全新的数组**（容量不够时），返回的 slice 头才指向正确的位置。
+为什么：旧的 slice 头可能还趴在废弃的旧数组上。所以标准姿势永远是 `s = append(s, ...)`。
 
 ---
 
 ## 10. copy
 
-`copy` 可以把一个 slice 的元素复制到另一个 slice。
+`copy(dst, src)` 把元素从一个 slice 复制到另一个：
 
 ```go
 src := []int{1, 2, 3}
@@ -207,32 +328,60 @@ dst := make([]int, len(src))
 
 n := copy(dst, src)
 
-fmt.Println(n)   // 3
-fmt.Println(dst) // [1 2 3]
+fmt.Println(n)
+fmt.Println(dst)
 ```
 
-返回值是实际复制的元素数量，等于两个 slice 长度中的较小值。
+```text
+3
+[1 2 3]
+```
+
+返回值是实际复制的元素个数（两边长度取小）。复制完就是两份独立数据了：
+
+```go
+dst[0] = 100
+fmt.Println(src, dst)
+```
+
+```text
+[1 2 3] [100 2 3]
+```
 
 ---
 
 ## 11. slice 不能直接比较
 
-slice 只能和 `nil` 比较。
+slice 只能和 `nil` 比，两个 slice 之间用 `==` 是编译错误：
 
 ```go
-var s []int
-fmt.Println(s == nil)
+package main
+
+import "fmt"
+
+func main() {
+	a := []int{1, 2}
+	b := []int{1, 2}
+	fmt.Println(a == b)
+}
 ```
 
-不能这样比较：
-
-```go
-// a := []int{1, 2}
-// b := []int{1, 2}
-// fmt.Println(a == b) // 编译错误
+```text
+# command-line-arguments
+./main.go:8:14: invalid operation: a == b (slice can only be compared to nil)
 ```
 
-如果要比较元素内容，可以自己循环，也可以在合适章节学习标准库里的 `slices.Equal`。
+对比 JS：`[1,2] === [1,2]` 是 `false`（比引用），也够迷惑的；Go 干脆不让比。要比内容，自己循环，或用标准库的 `slices.Equal`（标准库模块再展开）。
+
+---
+
+## 本篇重点
+
+- [ ] slice 变量 = 一个三字段的小值（data 指针 + len + cap），趴在底层数组上的**窗口**，不是箱子。
+- [ ] nil slice 可以直接 `len`/`range`/`append`；对外输出 JSON 时 nil 是 `null`、空 slice 是 `[]`。
+- [ ] `len` 管下标访问的合法范围，`cap` 是到底层数组末尾的总格数；`s[low:high:max]` 能掐断 cap。
+- [ ] 切片表达式不复制元素（和 JS 的 `slice()` 相反），新旧窗口共享同一个底层数组。
+- [ ] `append` 必须写成 `s = append(s, x)`——它可能搬家，不是 JS 的 `push`。
 
 ---
 
@@ -242,3 +391,5 @@ fmt.Println(s == nil)
 2. 用 `make([]string, 0, 5)` 创建 slice，连续 append 3 个字符串，观察 `len` 和 `cap`。
 3. 创建 nil slice 和空 slice，分别打印它们的 `len`、`cap` 和 `s == nil`。
 4. 用 `copy` 克隆一个 `[]int`，修改克隆后的 slice，确认原 slice 不变。
+
+提示：第 1 题先照第 7 节的图自己算一遍 cap 再运行验证；第 2 题注意 cap 会不会变——想想为什么。
