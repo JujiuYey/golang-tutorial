@@ -34,6 +34,76 @@ slice 头            底层数组
 
 （这个 `sliceHeader` 只是帮助理解的模型，不要在业务代码里用 `unsafe` 去掏 slice 的内部结构。）
 
+### slice 头 = 一个"含指针字段的 struct"而已
+
+slice 头的真相特别朴素——它跟下面这个 `Box` struct 在机制上**完全一样**，没多任何神秘：
+
+```go
+type Box struct {
+    name string
+    ref  *int
+}
+
+n := 42
+a := Box{name: "a", ref: &n}    // Box 在 Go 里就是个普通 struct
+b := a                          // 复制整个 Box —— 现在 b 也是独立 struct
+
+fmt.Println(a.ref == b.ref)     // true —— 两个 ref 字段值一样,都指向 n
+*b.ref = 99
+fmt.Println(n)                  // 99 —— 通过 b.ref 改的就是 n
+```
+
+`Box` 在 Go 里是值类型,但 `a`、`b` 因为字段 `ref` 都指向 `n`,能间接影响同一份底层数据。**slice 头就是 `Box` 把字段从 `name/ref` 换成 `data/len/cap`**——结构体、值类型、复制独立、靠指针字段共享底层数据,这些性质一模一样。所谓"slice 是引用类型"的来源,就是这一个指针字段。**认识到这一点,下面所有"灵异现象"都不灵异了**。
+
+### 把上面那点用代码按两个时刻跑一遍
+
+看完下面这两段,你脑子里 slice 的内部模型就成立了:
+
+```go
+var a []int               // a 这个变量就是 [data=nil,  len=0, cap=0] 三件套
+d := a                    // 复制 a 的三件套给 d —— d 是独立 struct
+d = append(d, 7, 8)       // 这一步里 a 完全没被碰过
+```
+
+```text
+时刻 1：d := a 复制完
+─────────────────────────────────────────────────────────────
+a:  [data = nil,   len = 0, cap = 0]   ← 一个栈槽
+d:  [data = nil,   len = 0, cap = 0]   ← 另一个独立的栈槽
+
+→ 两份独立 struct,内容这一刻相同
+   (data 字段值都是同一个地址 —— 也就是 nil)
+
+
+时刻 2：d = append(d, 7, 8)
+─────────────────────────────────────────────────────────────
+append 看到 d.cap = 0,装不下 → 必须分配新数组 NewArr
+返回新头 (data = &NewArr, len = 2, cap = 2),赋值给 d
+a 完全没碰过
+
+a:  [data = nil,      len = 0, cap = 0]   ← 仍是 nil
+d:  [data = &NewArr,  len = 2, cap = 2]   ← 指向新数组
+
+→ a == nil 还是 true,d = [7 8]
+   两份 struct 的 data 字段值不再相同
+```
+
+注意全程没有任何"对象身份"的戏码。**两个变量各自独立的 struct,data 字段值碰巧相同 → 共享底层;append 改了 d 的 data 字段值 → 各管各的**。
+
+### Go 跟 JS 在"值类型/引用类型"上的差异
+
+如果你从 JS 转过来,这一点要主动"洗掉"——因为 JS 的分类直接影响了你对 `array` 的默认直觉:
+
+|                      | JS                                  | Go                                               |
+| -------------------- | ----------------------------------- | ------------------------------------------------ |
+| 值类型               | number, string, boolean, null, ...  | int, float, bool, string, struct, **数组**, slice 头 |
+| 引用类型             | object, **array**, function         | slice, map, channel, pointer, interface          |
+| 数组归类             | **引用类型**                        | **值类型**                                       |
+
+JS 里数组是引用类型,你脑子的默认模式是"数组 = 共享同一实体"。Go 里数组 `[3]int` 是值类型(复制独立),slice 才是"值类型 + 含指针字段"的复合品。第一次接触 Go 的 slice **普遍会被这个组合绕进去**,这不是你的问题,是语言的心智负担点。
+
+**替代 JS 思维的口诀**:忘掉"变量 → 对象"的指向模型。Go 里 slice 变量就是栈上一个装着三个字段的小 struct;共享 = 两份 struct 里 `data` 字段值碰巧是同一个地址。
+
 ---
 
 ## 2. 声明 slice
@@ -207,6 +277,8 @@ fmt.Println(a)
 ```text
 [20 30 40]
 ```
+
+> 💡 `a` 本身就是 slice，类型是 `[]int`，跟 `var s []int` 或 `[]int{1, 2, 3}` 是同一种类型。区别只在数据怎么来——`arr[1:4]` 是"开窗"，字面量是"直接造数据"。`fmt.Printf("%T", a)` 跟任何 slice 一样会打出 `[]int`。
 
 语法和 JS 的 `slice(1, 4)` 一样是**左闭右开**：
 

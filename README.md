@@ -19,7 +19,7 @@
 
 | 路径 | 作用 |
 |------|------|
-| `01-工具链与HelloWorld/` 到 `11-工程化与验证/` | Go 主线课程模块 |
+| `01-工具链与HelloWorld/` 到 `12-工程化与验证/` | Go 主线课程模块 |
 | `project-01-CLI任务管理器/` | 综合项目 01：CLI 任务管理器 |
 | `project-02-FiberRESTAPI/` | 综合项目 02：Fiber REST API |
 | `.opencode/agent/go-tutor.md` | Go 学习助教 agent（讲解 / 记录 / 复习） |
@@ -34,15 +34,16 @@
 |------|------|----------|
 | [01](./01-工具链与HelloWorld/01-工具链与HelloWorld.md) | 工具链与 Hello World | 安装 Go、运行第一个程序、理解 Go Module |
 | [02](./02-类型状态与控制流/README.md) | 类型、状态与控制流 | 值、变量、常量、表达式、分支、循环 |
-| [03](./03-函数错误与边界/README.md) | 函数、错误与边界 | 函数组织、错误返回、defer、panic 边界 |
+| [03](./03-函数与代码组织/README.md) | 函数与代码组织 | 函数签名、多返回值、参数传递、函数值、闭包 |
 | [04](./04-数据结构与内存语义/README.md) | 数据结构与内存语义 | array、slice、map、struct、pointer、range 语义 |
 | [05](./05-接口组合与抽象/README.md) | 接口、组合与泛型 | 小接口、组合、泛型、抽象选择 |
-| [06](./06-并发模型/README.md) | 并发模型 | goroutine、channel、select、context、锁、race |
-| [07](./07-标准库/README.md) | 标准库 | IO、文件、JSON、时间、flag、slog、testing |
-| [08](./08-网络编程/README.md) | 网络编程 | HTTP 服务端、客户端、JSON API、TCP/UDP、httptest |
-| [09](./09-数据库与持久化/README.md) | 数据库与持久化 | database/sql、连接池、事务、SQL 参数、测试 |
-| [10](./10-Web服务/README.md) | Web 服务 | 分层结构、handler、service、repository、中间件、认证 |
-| [11](./11-工程化与验证/README.md) | 工程化与验证 | go mod、gofmt、vet、测试、race、benchmark、CI |
+| [06](./06-错误处理与程序边界/README.md) | 错误处理与程序边界 | error 接口、错误链、defer、panic/recover |
+| [07](./07-并发模型/README.md) | 并发模型 | goroutine、channel、select、context、锁、race |
+| [08](./08-标准库/README.md) | 标准库 | IO、文件、JSON、时间、flag、slog、testing |
+| [09](./09-网络编程/README.md) | 网络编程 | HTTP 服务端、客户端、JSON API、TCP/UDP、httptest |
+| [10](./10-数据库与持久化/README.md) | 数据库与持久化 | database/sql、连接池、事务、SQL 参数、测试 |
+| [11](./11-Web服务/README.md) | Web 服务 | 分层结构、handler、service、repository、中间件、认证 |
+| [12](./12-工程化与验证/README.md) | 工程化与验证 | go mod、gofmt、vet、测试、race、benchmark、CI |
 | [Project 01](./project-01-CLI任务管理器/project-01-CLI任务管理器.md) | CLI 任务管理器 | 命令行、文件持久化、结构拆分、本地验证 |
 | [Project 02](./project-02-FiberRESTAPI/project-02-FiberRESTAPI.md) | Fiber REST API + Bun | Web API、认证、数据库、服务分层、综合练习 |
 
@@ -87,7 +88,7 @@ go test -race ./...
 或：
 
 ```text
-我刚读完 03-函数错误与边界/04-defer.md，陪我过一遍
+我刚读完 03-函数与代码组织/04-函数类型匿名函数与闭包.md，陪我过一遍
 ```
 
 agent 应该先读取 `learning-log/profile.md`，再只问你一个诊断问题。
@@ -145,39 +146,39 @@ agent 会先给出学习日志草稿，例如：
 
 复习目标：能解释零值、作用域、变量遮蔽、`range` 的基本行为。
 
-### 第 3-4 周：函数、错误、数据结构
+### 第 3-4 周：函数与数据结构
 
-学习 03、04。重点掌握函数签名、多返回值、错误返回、`defer`、slice、map、struct 和 pointer。
+学习 03、04。重点掌握函数签名、多返回值、参数传递、闭包、slice、map、struct 和 pointer。
 
-复习目标：能判断一段代码复制了什么、共享了什么、错误有没有被正确处理。
+复习目标：能判断一段代码怎样通过函数组织，以及复制了什么、共享了什么。
 
-### 第 5 周：接口、组合与泛型
+### 第 5 周：接口与错误处理
 
-学习 05。重点掌握小接口、隐式实现、接口值 nil、组合、泛型函数和类型约束。
+先学习 05 的小接口、隐式实现、接口值 nil、组合与泛型，再学习 06 的错误返回、错误链、`defer` 和 `panic/recover`。理解 `error` 时要能把它和接口方法集合对应起来。
 
-复习目标：能判断什么时候先写具体代码，什么时候再抽象接口或泛型。
+复习目标：能判断什么时候抽象接口，以及一次失败该返回 `error` 还是属于真正的 panic。
 
 ### 第 6 周：并发模型
 
-学习 06。重点掌握 goroutine 生命周期、channel 关闭、`select`、`context`、锁和 race detector。
+学习 07。重点掌握 goroutine 生命周期、channel 关闭、`select`、`context`、锁和 race detector。
 
 复习目标：能解释谁退出、谁关闭、谁取消，以及共享状态是否被保护。
 
 ### 第 7 周：标准库
 
-学习 07。重点掌握文件 IO、JSON、时间、命令行参数、结构化日志和测试工具。
+学习 08。重点掌握文件 IO、JSON、时间、命令行参数、结构化日志和测试工具。
 
 复习目标：遇到常见任务时，能先想到标准库和对应验证方式。
 
 ### 第 8-9 周：网络、数据库与 Web 服务
 
-学习 08、09、10。重点掌握 HTTP handler、client timeout、JSON API、数据库连接池、事务、repository 和 Web 服务分层。
+学习 09、10、11。重点掌握 HTTP handler、client timeout、JSON API、数据库连接池、事务、repository 和 Web 服务分层。
 
 复习目标：能用 `httptest`、`curl`、日志和测试验证 API 行为。
 
 ### 第 10 周：工程化与验证
 
-学习 11。重点掌握 `gofmt`、`go vet`、表驱动测试、覆盖率、race detector、benchmark 和 CI。
+学习 12。重点掌握 `gofmt`、`go vet`、表驱动测试、覆盖率、race detector、benchmark 和 CI。
 
 复习目标：能用工具链证明代码质量，而不是只靠口头判断。
 

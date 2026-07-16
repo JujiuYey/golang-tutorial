@@ -31,6 +31,19 @@ delete(scores, "alice")
 0
 ```
 
+### 四种写法分两阵营
+
+`var` 给的是 nil；`make` 和 `{}` 都给**非 nil 的空 map**——`len()` 全是 0，但 `m == nil` 答案不同：
+
+| 写法 | `m == nil` | `len(m)` | 能写吗 |
+|---|---|---|---|
+| `var m map[string]int` | true | 0 | 不能（panic，见下） |
+| `m := map[string]int{}` | false | 0 | 能 |
+| `m := make(map[string]int)` | false | 0 | 能 |
+| `m := make(map[string]int, 100)` | false | 0 | 能（多一个容量提示） |
+
+对比 slice：`var s []int` 是 nil slice，`s := []int{}` 和 `s := make([]int, 0)` 都是非 nil 空 slice——但 slice 那边 nil 和空行为几乎一样（都能 append），map 这边不一样：nil map 能读/删/`len` 但**不能写**，空 map 读写删都行。这正是为什么 map 用之前必须 make 或字面量，slice 用之前可以光 var。
+
 ### 🕳️ 坑：nil map 不能写
 
 以为会怎样：像 nil slice 一样，append/写入自动就能用。
@@ -112,7 +125,7 @@ fmt.Println(scores["bob"])
 实际怎样：安静地返回 value 类型的零值——`int` 就是 `0`。
 为什么：Go 没有 undefined。于是"bob 考了 0 分"和"根本没有 bob"读出来一模一样。
 
-要区分这两种情况，用 **comma ok**（02 模块类型断言、03 模块 map 查错都见过这个模式）：
+要区分这两种情况，用 **comma ok**。它和第 03 章的多返回值是同一种接收方式：第一个值是查询结果，第二个 `bool` 表示键是否存在：
 
 ```go
 score, ok := scores["bob"]
