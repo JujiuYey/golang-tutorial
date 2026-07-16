@@ -1,3 +1,4 @@
+
 # Go 诊断式陪练教程
 
 这是一套用来系统学习 Go 的教程仓库。它不只整理知识点，更强调一种学习方式：先暴露当前理解，再围绕一个具体卡点解释、练习和验证。
@@ -21,8 +22,7 @@
 | `01-工具链与HelloWorld/` 到 `11-工程化与验证/` | Go 主线课程模块 |
 | `project-01-CLI任务管理器/` | 综合项目 01：CLI 任务管理器 |
 | `project-02-FiberRESTAPI/` | 综合项目 02：Fiber REST API |
-| `.opencode/agent/go-feynman-tutor.md` | 诊断式 Go 陪练 agent |
-| `.opencode/skill/go-feynman-4-questions/` | 单问式费曼自检 skill |
+| `.opencode/agent/go-tutor.md` | Go 学习助教 agent（讲解 / 记录 / 复习） |
 | `learning-log/` | 学习画像和每日学习日志 |
 | `AGENTS.md` | 本仓库 agent 行为守则 |
 

@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "02-类型状态与控制流/10-基础语法综合练习.md",
+                "file": "02-类型状态与控制流/01-值类型与字面量.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "10-基础语法综合练习"
+              "title": "01-值类型与字面量"
             }
           }
         ]
@@ -156,13 +156,13 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "02-类型状态与控制流/10-基础语法综合练习.md",
+                "file": "02-类型状态与控制流/01-值类型与字面量.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "10-基础语法综合练习 的大纲"
+              "title": "01-值类型与字面量 的大纲"
             }
           }
         ],
@@ -185,6 +185,12 @@
   },
   "active": "e752057f85095b14",
   "lastOpenFiles": [
+    "01-工具链与HelloWorld/01-工具链与HelloWorld.md",
+    "README.md",
+    "AGENTS.md",
+    "03-函数错误与边界/01-函数定义参数与返回值.md",
+    "03-函数错误与边界/README.md",
+    "02-类型状态与控制流/10-基础语法综合练习.md",
     "02-类型状态与控制流/09-switch与跳转语句.md",
     "temp/switch_basic.go",
     "02-类型状态与控制流/08-for循环与range.md",
@@ -206,20 +212,15 @@
     "02-类型状态与控制流/04-数字类型与运算.md",
     "temp/percent.go",
     "02-类型状态与控制流/03-常量与iota.md",
-    "AGENTS.md",
     "02-类型状态与控制流/02-变量声明赋值零值与作用域.md",
     "docs/superpowers/specs/2026-06-17-teacher-led-go-learning-loop-design.md",
     "02-类型状态与控制流/01-值类型与字面量.md",
     "learning-log/daily/2026-06-17.md",
     "02-类型状态与控制流/README.md",
-    "01-工具链与HelloWorld/01-工具链与HelloWorld.md",
-    "README.md",
     "11-工程化与验证/01-工程化与验证心智模型.md",
     "11-工程化与验证/02-项目结构包边界与internal.md",
     "11-工程化与验证/03-Go-Modules依赖版本与可复现构建.md",
     "11-工程化与验证/04-格式化go-vet与静态检查.md",
-    "11-工程化与验证/05-单元测试表驱动测试与子测试.md",
-    "11-工程化与验证/06-测试替身临时资源与httptest.md",
     "Day01-环境搭建与HelloWorld/slides/imgs/cover.png"
   ]
 }

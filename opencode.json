@@ -1,11 +1,5 @@
 {
   "$schema": "https://opencode.ai/config.json",
-  "default_agent": "go-feynman-tutor",
-  "instructions": ["AGENTS.md"],
-  "command": {
-    "quiz": {
-      "description": "基于当前 Go 课程文章出 3 道易错题，强制解释机制而非记忆。用于学完一节后自测。",
-      "template": "# /quiz\n\n从当前打开的 Go 学习模块文章里抽 3 道易错题，**不出\"是什么\"题，只出\"为什么这样写\"和\"如果去掉 X 会怎样\"题**。\n\n## 流程\n\n1. 询问用户：\"你刚学完哪篇文章？给我路径（如 `02-类型状态与控制流/04-数字类型与运算.md`）\"\n2. 读取该文章，识别该模块的 3 个最易错点\n3. 出 3 道题，每题必须：\n   - 给出**可执行的最小代码片段**（≤ 15 行）\n   - 问\"输出是什么 / 为什么 / 如果去掉 X 行会怎样\"\n4. 用户答完一题后再出下一题，**不要一次性出完 3 题**\n5. 答对 → 进入下一题；答错 → 给反例让他重答，**不直接给答案**\n\n## 出题模板\n\n```go\n// 题目 N：<主题>\npackage main\nimport \"fmt\"\nfunc main() {\n    // 故意暴露易错点的代码\n}\n```\n\n**问：输出是什么？为什么？**\n\n## 覆盖范围\n\n从这些维度抽题：\n\n- 变量遮蔽、零值、作用域（模块 02）\n- 错误返回、defer 顺序、panic/recover（模块 03）\n- slice/map 共享、append 重新分配、range 复制（模块 04）\n- 空 interface、类型断言、泛型约束（模块 05）\n- channel 关闭、select 行为、context 取消（模块 06）\n- 测试表驱动、httptest、t.Helper（模块 07/08/11）\n\n## 收尾\n\n3 题答完后，引导用户用一句话总结：\n\n> \"你现在能判断哪类 Go 代码问题？\"\n"
-    }
-  }
+  "default_agent": "go-tutor",
+  "instructions": ["AGENTS.md"]
 }
