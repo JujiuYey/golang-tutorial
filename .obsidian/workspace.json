@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "02-类型状态与控制流/01-值类型与字面量.md",
-                "mode": "source",
+                "file": "04-数据结构与内存语义/08-指针地址解引用与可变状态.md",
+                "mode": "preview",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "01-值类型与字面量"
+              "title": "08-指针地址解引用与可变状态"
             }
           }
         ]
@@ -78,7 +78,7 @@
       }
     ],
     "direction": "horizontal",
-    "width": 300.5
+    "width": 290.5
   },
   "right": {
     "id": "f93f0e97199298da",
@@ -156,13 +156,13 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "02-类型状态与控制流/01-值类型与字面量.md",
+                "file": "04-数据结构与内存语义/08-指针地址解引用与可变状态.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "01-值类型与字面量 的大纲"
+              "title": "08-指针地址解引用与可变状态 的大纲"
             }
           }
         ],
@@ -170,7 +170,8 @@
       }
     ],
     "direction": "horizontal",
-    "width": 300
+    "width": 300,
+    "collapsed": true
   },
   "left-ribbon": {
     "hiddenItems": {
@@ -185,6 +186,13 @@
   },
   "active": "e752057f85095b14",
   "lastOpenFiles": [
+    "04-数据结构与内存语义/07-struct方法接收者与嵌入.md",
+    "04-数据结构与内存语义/08-指针地址解引用与可变状态.md",
+    "04-数据结构与内存语义/06-struct基础.md",
+    "04-数据结构与内存语义/05-map内存语义排序与并发边界.md",
+    "learning-log/daily/2026-07-18.md",
+    "04-数据结构与内存语义/04-map基础.md",
+    "02-类型状态与控制流/01-值类型与字面量.md",
     "03-函数与代码组织/03-可变参数与参数传递.md",
     "06-错误处理与程序边界/README.md",
     "03-函数与代码组织/05-函数综合练习.md",
@@ -206,14 +214,7 @@
     "07-并发模型/10-数据竞争死锁与goroutine泄漏.md",
     "07-并发模型/09-Once-syncMap与atomic.md",
     "07-并发模型/08-Mutex与RWMutex保护共享状态.md",
-    "07-并发模型/07-context取消超时与请求边界.md",
-    "07-并发模型/05-关闭channel-range与退出信号.md",
-    "07-并发模型/04-缓冲channel与单向channel.md",
-    "07-并发模型/03-channel基础发送接收与阻塞.md",
-    "07-并发模型/02-WaitGroup等待任务完成.md",
-    "07-并发模型/01-goroutine基础与调度模型.md",
     "07-并发模型",
-    "08-标准库/09-errors-sort-slices-maps.md",
     "08-标准库",
     "09-网络编程",
     "10-数据库与持久化",
